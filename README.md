@@ -88,7 +88,7 @@ dsh plugin add --offline file:dsh-link-0.18.36.tgz
 | 文件（`<DSH_HOME>/dsh-remote/`） | 用途 |
 |---|---|
 | `role.json` | 本机角色：`desktop` / `mobile` |
-| `link.json` | 网关：`port` / `listen` / `upstreamPort` / `addressFamily` / `allowGlobal` / `discovery` / `ddns` |
+| `link.json` | 网关：`port` / `listen` / `upstreamPort` / `addressFamily` / `allowGlobal` / `discovery` / `ddns`；同步节奏：`syncIntervalMs`（会话/镜像 autosync，缺省 10s、最小 5s）、`memsyncIntervalMs`（记忆同步，缺省 30s、最小 10s） |
 | `link-peer.json`（电脑） | 反向通道：`url` / `key` / `certFp` / `notify` / `devices[]` |
 | `link-client.json`（手机） | 电脑地址信任：`certFp` / `allowHost` / `allowSelfSigned` |
 | `mobile.json`（手机） | 电脑端点、设备身份、`notifyTargetSession`、`resolveSources` |
@@ -154,6 +154,7 @@ npm run build   # 由 lib/mobile/client.js 重建包内 chunk
 | 版本 | 变更 |
 |---|---|
 | 0.18.36 | 当前版本。局域网直连主链路：两段式配对（手机发起 → 电脑确认，不再手输码）、设备白名单 + HMAC + 一次性 nonce、IPv6 / 双栈、局域网发现、可选 DDNS、电脑 → 手机通知（只回投手机发起的回合）、手机 → 电脑 `sendToDesktop`、插件双向分发、记忆同步、会话镜像与预载、桌面配置向导。 |
+| 0.18.37 | 同步节奏改为「连上就同步」：autosync 首次 2 秒、缺省 10 秒（可配 `syncIntervalMs`，最小 5 秒）；记忆同步（memsync）首次 5 秒、缺省 30 秒且可配 `memsyncIntervalMs`（取代写死的 30 分钟）。 |
 | 0.18.x | 稳定性与真机问题收口：seq 平移与预载历史、镜像会话唤醒、归档会话处理、通知标题三级回落、pairKey 自愈、插件版本查询不依赖会话服务。 |
 | 0.2.0 | 首次连接配置向导（`/api/dsh-remote/link/setup`），工作区多选与四档隐藏策略（两端 LWW 合并、删除优先、本机隐藏永不上传），验证码 5 分钟倒计时，配对状态 3 秒轻轮询；UI 去渐变/毛玻璃/emoji，改单一强调色。 |
 | 0.1.5 | 记忆同步 `fp` 兜底：两端 `dsh-memory-layer` 版本错开时按归一正文配对，并回写指纹。 |
