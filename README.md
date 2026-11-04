@@ -18,8 +18,8 @@
 ## 结构
 
 ```
-dsh-link/
-├─ package.json            name=dsh-link，main=lib/host.js
+@klrsl/dsh-link/
+├─ package.json            name=@klrsl/dsh-link，main=lib/host.js
 ├─ cordis.patch.yml        profile 的 loader insert 行（name 必须与包名一致）
 ├─ locale/                 插件卡片文案（zh/en 各写 meta.title/description）
 ├─ lib/
@@ -47,7 +47,9 @@ dsh-link/
 
 ```bash
 # 1) 安装（电脑、手机各一次）
-dsh plugin add --offline file:dsh-link-0.18.36.tgz
+dsh plugin add @klrsl/dsh-link
+# 离线也可以（先把 tgz 放到本机）：
+dsh plugin add --offline file:klrsl-dsh-link-0.18.37.tgz
 
 # 2) 确认/写角色：电脑 desktop，手机 mobile
 #    <DSH_HOME>/dsh-remote/role.json  →  {"role": "desktop"}
@@ -79,7 +81,7 @@ dsh plugin add --offline file:dsh-link-0.18.36.tgz
   // { "ok": true, "sessionId": "…" } 或 { "ok": false, "error": "…" }
   ```
 
-- **电脑给手机装插件**：`node <profile>/node_modules/dsh-link/scripts/link-install.mjs <插件.tgz>`，手机会弹一次确认卡片，点「允许」才解包安装。
+- **电脑给手机装插件**：`node <profile>/node_modules/@klrsl/dsh-link/scripts/link-install.mjs <插件.tgz>`，手机会弹一次确认卡片，点「允许」才解包安装。
 - **手机给电脑推插件**：手机装了新版本而电脑还是旧的时，会自动把插件包推过去换装（电脑重启后生效）。
 - **记忆同步**：同一条记忆在两端按指纹配对合并（同指纹正文变更以电脑为准；电脑侧归档会传到手机）。
 

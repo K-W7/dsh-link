@@ -1,5 +1,5 @@
 {
-	"name": "dsh-link",
+	"name": "@klrsl/dsh-link",
 	"version": "0.18.37",
 	"description": "Keep using a desktop DSH session from your phone: chat, watch the live output, and get the result on your phone when a desktop turn finishes.",
 	"type": "module",
