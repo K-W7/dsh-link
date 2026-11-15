@@ -61,6 +61,10 @@ check('官方服务失败退回手工 append', host.includes('session.append(\'s
 check('诊断有独立定时器', host.includes('const diagTick = async () =>'));
 check('诊断带上 workspaceMap', host.includes('workspaceMap: Object.entries(workspaceMap'));
 
+// ⑧ 电脑端清单兜底：cwd 命中但没挂在工作区实体上的会话也要进清单
+const desktopSource = readFileSync(resolve(here, '../lib/desktop/index.js'), 'utf8');
+check('挂载表兜底（cwd 命中即算）', desktopSource.includes('挂载表兜底'));
+
 if (failures > 0) {
 	console.log(`\nsession-sync: ${failures} 项失败`);
 	process.exit(1);
