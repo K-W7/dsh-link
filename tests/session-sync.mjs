@@ -57,6 +57,10 @@ check('占位标题归一成空', host.includes('rawTitle === UNTITLED_PLACEHOLD
 check('标题优先走官方 sessionTitle.rename', host.includes('titleService.rename(session, wantedTitle)'));
 check('官方服务失败退回手工 append', host.includes('session.append(\'session/title\''));
 
+// ⑦ 诊断不能依赖 run()（workspaceMap 为空时 run 会提前 return）
+check('诊断有独立定时器', host.includes('const diagTick = async () =>'));
+check('诊断带上 workspaceMap', host.includes('workspaceMap: Object.entries(workspaceMap'));
+
 if (failures > 0) {
 	console.log(`\nsession-sync: ${failures} 项失败`);
 	process.exit(1);
