@@ -28,7 +28,7 @@ const sourcePath = resolve(here, '../lib/mobile/client.js');
 const chunkPath = resolve(here, '../lib/client.mobile.js');
 
 /** 注入点：模块描述里 `id` 之后。 */
-const ANCHOR = "\tid: '@klrsl/dsh-link',\n";
+const ANCHOR = "\tid: '@k-w7/dsh-link',\n";
 /** 只有 chunk 才有的那行。 */
 const CHUNK_LINE = "\tchunk: 'client.mobile.js',\n";
 

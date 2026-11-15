@@ -18,8 +18,8 @@
 ## 结构
 
 ```
-@klrsl/dsh-link/
-├─ package.json            name=@klrsl/dsh-link，main=lib/host.js
+@k-w7/dsh-link/
+├─ package.json            name=@k-w7/dsh-link，main=lib/host.js
 ├─ cordis.patch.yml        profile 的 loader insert 行（name 必须与包名一致）
 ├─ locale/                 插件卡片文案（zh/en 各写 meta.title/description）
 ├─ lib/
@@ -47,9 +47,9 @@
 
 ```bash
 # 1) 安装（电脑、手机各一次）
-dsh plugin add @klrsl/dsh-link
+dsh plugin add @k-w7/dsh-link
 # 离线也可以（先把 tgz 放到本机）：
-dsh plugin add --offline file:klrsl-dsh-link-0.18.38.tgz
+dsh plugin add --offline file:k-w7-dsh-link-0.19.0.tgz
 
 # 2) 确认/写角色：电脑 desktop，手机 mobile
 #    <DSH_HOME>/dsh-remote/role.json  →  {"role": "desktop"}
@@ -81,7 +81,7 @@ dsh plugin add --offline file:klrsl-dsh-link-0.18.38.tgz
   // { "ok": true, "sessionId": "…" } 或 { "ok": false, "error": "…" }
   ```
 
-- **电脑给手机装插件**：`node <profile>/node_modules/@klrsl/dsh-link/scripts/link-install.mjs <插件.tgz>`，手机会弹一次确认卡片，点「允许」才解包安装。
+- **电脑给手机装插件**：`node <profile>/node_modules/@k-w7/dsh-link/scripts/link-install.mjs <插件.tgz>`，手机会弹一次确认卡片，点「允许」才解包安装。
 - **手机给电脑推插件**：手机装了新版本而电脑还是旧的时，会自动把插件包推过去换装（电脑重启后生效）。
 - **记忆同步**：同一条记忆在两端按指纹配对合并（同指纹正文变更以电脑为准；电脑侧归档会传到手机）。
 
@@ -155,7 +155,8 @@ npm run build   # 由 lib/mobile/client.js 重建包内 chunk
 
 | 版本 | 变更 |
 |---|---|
-| 0.18.38 | 当前版本。对端地址自动跟随 DHCP：电脑 → 手机的通知和 `link-install` 在发请求前先用 `devices.json` 的 `lastIp` 校正主机名（只换地址，端口、`x-link-key`、`certFp` 指纹 pin 一个不动），手机换地址不再长成「手机不在线」的 `ECONNREFUSED`；电脑端 `setup.json` 的 `host` 自动跟随本机 IPv4（只认 IPv4 字面量或空值，域名 / IPv6 / 开了 DDNS 的配置一律不碰）。 |
+| 0.19.0 | 包名迁到组织：`@klrsl/dsh-link` → **`@k-w7/dsh-link`**（同一份代码，只换名字；插件收包白名单同时认新名、旧 scope 名和旧裸名，所以跨版本的手机端推送不会 401）。安装命令改成 `dsh plugin add @k-w7/dsh-link`。 |
+| 0.18.38 | 对端地址自动跟随 DHCP：电脑 → 手机的通知和 `link-install` 在发请求前先用 `devices.json` 的 `lastIp` 校正主机名（只换地址，端口、`x-link-key`、`certFp` 指纹 pin 一个不动），手机换地址不再长成「手机不在线」的 `ECONNREFUSED`；电脑端 `setup.json` 的 `host` 自动跟随本机 IPv4（只认 IPv4 字面量或空值，域名 / IPv6 / 开了 DDNS 的配置一律不碰）。 |
 | 0.18.36 | 局域网直连主链路：两段式配对（手机发起 → 电脑确认，不再手输码）、设备白名单 + HMAC + 一次性 nonce、IPv6 / 双栈、局域网发现、可选 DDNS、电脑 → 手机通知（只回投手机发起的回合）、手机 → 电脑 `sendToDesktop`、插件双向分发、记忆同步、会话镜像与预载、桌面配置向导。 |
 | 0.18.37 | 同步节奏改为「连上就同步」：autosync 首次 2 秒、缺省 10 秒（可配 `syncIntervalMs`，最小 5 秒）；记忆同步（memsync）首次 5 秒、缺省 30 秒且可配 `memsyncIntervalMs`（取代写死的 30 分钟）。 |
 | 0.18.x | 稳定性与真机问题收口：seq 平移与预载历史、镜像会话唤醒、归档会话处理、通知标题三级回落、pairKey 自愈、插件版本查询不依赖会话服务。 |
