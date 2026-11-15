@@ -19,13 +19,13 @@
 		"lan",
 		"android"
 	],
-	"homepage": "https://github.com/KLRSL/dsh-link#readme",
+	"homepage": "https://github.com/K-W7/dsh-link#readme",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/KLRSL/dsh-link.git"
+		"url": "git+https://github.com/K-W7/dsh-link.git"
 	},
 	"bugs": {
-		"url": "https://github.com/KLRSL/dsh-link/issues"
+		"url": "https://github.com/K-W7/dsh-link/issues"
 	},
 	"author": "KLRSL",
 	"dsh": {
