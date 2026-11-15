@@ -68,6 +68,9 @@ check('电脑端有 traceRpc', desktop.includes('function traceRpc('));
 check('RPC 路由里调用了 traceRpc', desktop.includes('traceRpc(body.method, body.params, result'));
 check('电脑端有 linkDiag 分支', desktop.includes("case 'linkDiag':"));
 check('linkDiag 落 phone-diag.jsonl', desktop.includes("'phone-diag.jsonl'"));
+// scope 包名不能直接当文件名（`inbox/@k-w7/dsh-link-….tgz` 会 ENOENT）
+const receive = read('lib/desktop/plugin-receive.js');
+check('收包端把 scope 包名压成安全文件名', receive.includes('fileSlug'));
 check('手机端有 pushDiag', host.includes('async function pushDiag('));
 check('手机端有最近日志尾巴', host.includes('const recentDiagLines = []'));
 check('autosync 失败会上报', host.includes("pushDiag(config, 'autosync-error'"));
