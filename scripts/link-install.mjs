@@ -40,6 +40,7 @@ import { resolve } from 'node:path';
 import { InstallError, readTgzPackage, sha256Hex } from '../lib/mobile/plugin-install.js';
 import { statePathOf } from '../lib/shared/home.js';
 import { unwrapHost } from '../lib/shared/net.js';
+import { preferCurrentPeerUrl } from '../lib/shared/peer-address.js';
 
 const EXIT_OK = 0;
 const EXIT_USAGE = 1;
@@ -220,8 +221,10 @@ async function main() {
 	const sha256 = sha256Hex(tgz);
 
 	// ② 配置：命令行 > link-peer.json。
+	// ⚠️ 手机是 DHCP 的，配置里那个地址可能早就过期了：以 devices.json 的 lastIp
+	// 为准校正主机名（端口/密钥/指纹都不动，身份校验一点没放宽）。
 	const peer = readPeerConfig(options.config);
-	const url = options.url !== '' ? options.url : peer.url;
+	const url = preferCurrentPeerUrl(options.url !== '' ? options.url : peer.url, { log: (line) => console.log(`[link-install] ${line}`) });
 	const key = options.key !== '' ? options.key : peer.key;
 	if (url === '' || key === '') {
 		const why = peer.error !== undefined ? `（读 ${peer.path} 失败: ${peer.error}）` : `（${peer.path} 里缺 url/key）`;
