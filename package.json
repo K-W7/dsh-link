@@ -1,6 +1,6 @@
 {
 	"name": "@k-w7/dsh-link",
-	"version": "0.21.1",
+	"version": "0.21.2",
 	"description": "Keep using a desktop DSH session from your phone: chat, watch the live output, and get the result on your phone when a desktop turn finishes.",
 	"type": "module",
 	"main": "./lib/host.js",
