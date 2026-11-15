@@ -71,6 +71,10 @@ check('corrupt 命中后隔离重建再试', host.includes('隔离重建后重�
 check('no-window 有限重试（不再静默出队）', host.includes("outcome.status === 'no-window'"));
 check('空壳镜像打开时改走远端流', host.includes('needsPreload(localLogForOpen)'));
 
+// ⑩ 设置页「最近同步」要认后台 autosync 的结果（否则永远显示 0）
+check('后台同步累加最近同步计数', host.includes('noteSynced(syncedIds.length)'));
+check('后台失败写进最近同步', host.includes('noteSyncFailed('));
+
 if (failures > 0) {
 	console.log(`\nsession-sync: ${failures} 项失败`);
 	process.exit(1);
