@@ -1,6 +1,6 @@
 {
 	"name": "@k-w7/dsh-link",
-	"version": "0.19.0",
+	"version": "0.21.1",
 	"description": "Keep using a desktop DSH session from your phone: chat, watch the live output, and get the result on your phone when a desktop turn finishes.",
 	"type": "module",
 	"main": "./lib/host.js",
@@ -52,7 +52,7 @@
 	},
 	"scripts": {
 		"build": "node scripts/build-client-chunk.mjs",
-		"test": "node tests/check-syntax.mjs && node tests/preload-window.mjs && node tests/memsync-merge.mjs && node tests/link-config.mjs && node tests/pairing.mjs && node tests/agent-message.mjs && node tests/send-to-desktop.mjs && node tests/notify-target.mjs",
+		"test": "node tests/check-syntax.mjs && node tests/preload-window.mjs && node tests/memsync-merge.mjs && node tests/link-config.mjs && node tests/pairing.mjs && node tests/agent-message.mjs && node tests/send-to-desktop.mjs && node tests/notify-target.mjs && node tests/plugin-install-confirm.mjs && node tests/session-sync.mjs",
 		"prepack": "node scripts/build-client-chunk.mjs"
 	},
 	"license": "MIT"
