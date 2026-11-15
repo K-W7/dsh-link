@@ -65,6 +65,11 @@ check('诊断带上 workspaceMap', host.includes('workspaceMap: Object.entries(w
 const desktopSource = readFileSync(resolve(here, '../lib/desktop/index.js'), 'utf8');
 check('挂载表兜底（cwd 命中即算）', desktopSource.includes('挂载表兜底'));
 
+// ⑨ P1：打开镜像前补历史 + corrupt 自愈 + no-window 有限重试
+check('打开镜像前先补历史', host.includes('打开镜像前补历史'));
+check('corrupt 命中后隔离重建再试', host.includes('隔离重建后重试'));
+check('no-window 有限重试（不再静默出队）', host.includes("outcome.status === 'no-window'"));
+
 if (failures > 0) {
 	console.log(`\nsession-sync: ${failures} 项失败`);
 	process.exit(1);
