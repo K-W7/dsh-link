@@ -62,6 +62,17 @@ check(
 );
 check('chunk 里确实带着确认条与事件监听', chunk.includes('showPluginInstallBar') && chunk.includes("addEventListener('plugin-install-request'"));
 
+// ④ 诊断通道（0.20.1）：电脑端 RPC 追踪 + linkDiag 落盘；手机端 pushDiag 定时上报。
+const desktop = read('lib/desktop/index.js');
+check('电脑端有 traceRpc', desktop.includes('function traceRpc('));
+check('RPC 路由里调用了 traceRpc', desktop.includes('traceRpc(body.method, body.params, result'));
+check('电脑端有 linkDiag 分支', desktop.includes("case 'linkDiag':"));
+check('linkDiag 落 phone-diag.jsonl', desktop.includes("'phone-diag.jsonl'"));
+check('手机端有 pushDiag', host.includes('async function pushDiag('));
+check('手机端有最近日志尾巴', host.includes('const recentDiagLines = []'));
+check('autosync 失败会上报', host.includes("pushDiag(config, 'autosync-error'"));
+check('autosync 会推周期快照', host.includes("pushDiag(config, 'periodic'"));
+
 if (failures > 0) {
 	console.log(`\nplugin-install-confirm: ${failures} 项失败`);
 	process.exit(1);
