@@ -52,6 +52,7 @@
 	},
 	"scripts": {
 		"build": "node scripts/build-client-chunk.mjs",
+		"pretest": "node scripts/build-client-chunk.mjs",
 		"test": "node tests/check-syntax.mjs && node tests/preload-window.mjs && node tests/memsync-merge.mjs && node tests/link-config.mjs && node tests/pairing.mjs && node tests/agent-message.mjs && node tests/send-to-desktop.mjs && node tests/notify-target.mjs && node tests/plugin-install-confirm.mjs && node tests/session-sync.mjs",
 		"prepack": "node scripts/build-client-chunk.mjs"
 	},
