@@ -6,7 +6,7 @@
 - 流量只走局域网（跨网络可选 DDNS，见下文）；
 - 一个包，两端都装：启动时读 `<DSH_HOME>/dsh-remote/role.json` 的 `role`，只加载对应那一半实现。
 
-当前版本 **0.22.0**。
+当前版本 **0.22.1**。
 
 ## 它是什么、不是什么
 
@@ -21,7 +21,7 @@
 
 1. **配对**：手机先发起，电脑弹卡片确认（卡上 6 位数字与手机端一致）。确认后手机进入设备白名单，拿到一把 `pairKey` 用于反向通道。
 2. **通道**：两端各起一个 TLS 网关（电脑 `8899` / 手机 `8898`），自签证书 + **指纹 pin**，不信任系统 CA。手机 → 电脑走 RPC 与 SSE 实时流；电脑 → 手机走 `agent-message` / `plugin-install`，凭 `x-link-key` + 时间戳 + **一次性 nonce**。
-3. **打开会话（0.20.7 起）**：**联机时同步会话一律走远端流**──先取电脑的历史快照，再纯转发电脑的实时事件；本地镜像只在**断线**时兜底。这样不会出现「本地镜像半截 → 官方读盘判损坏 → 历史加载失败」。
+3. **打开会话（0.22.0 起）**：**联机时同步会话一律走远端流**──首屏历史按官方分页协议向电脑要（`page` → 电脑 `readHistory`，每页 500 条、最多取到 2000 条），实时事件纯转发；**往上滑也代理到电脑**（`beforeSeq` / `throughSeq` 原样透传），`hasMore` 据实回报。本地镜像只在**断线**时兜底。这样不会出现「本地镜像半截 → 官方读盘判损坏 → 历史加载失败」，也不会只有开头一小段、往上翻不动。
 4. **自动同步（autosync）**：每 `syncIntervalMs`（缺省 10 秒，最小 5 秒）拉一次电脑的会话清单，把**新出现、非空白、非归档**的会话登记到手机侧边栏。基线只记**真正建成**的 id；逐条失败进退避表（10s → 10min）并上报，不会一次失败就永久拉黑。
 
 所有运行时数据都在 `<DSH_HOME>/dsh-remote/`（默认 `~/.dsh/dsh-remote/`），不进仓库、不上传。
@@ -32,10 +32,10 @@
 
 ```bash
 # 电脑、手机各一次
-dsh plugin add @k-w7/dsh-link@0.21.1
+dsh plugin add @k-w7/dsh-link@0.22.1
 
 # 离线也可以
-dsh plugin add --offline file:k-w7-dsh-link-0.21.1.tgz
+dsh plugin add --offline file:k-w7-dsh-link-0.22.1.tgz
 
 # 确认/写角色：电脑 desktop，手机 mobile
 #   <DSH_HOME>/dsh-remote/role.json → {"role": "desktop"}
@@ -80,11 +80,12 @@ dsh plugin add --offline file:k-w7-dsh-link-0.21.1.tgz
 
 - **手机给电脑推插件**：手机装了比电脑新的版本时，会自动把包推给电脑换装（电脑重启后生效）。
 
-## 会话同步模型（0.21.x）
+## 会话同步模型（0.22.x）
 
 | 场景 | 行为 |
 |---|---|
-| 联机 + 打开某个同步会话 | 走**远端流**：取电脑历史快照 + 转发电脑实时事件，不读本地镜像 |
+| 联机 + 打开某个同步会话 | 走**远端流**：首屏历史向电脑取（每页 500 条、上限 2000 条）+ 转发电脑实时事件，不读本地镜像 |
+| 联机 + 往上滑 | `controller.page` 代理到电脑的 `readHistory`：`beforeSeq` / `throughSeq` 原样透传，`hasMore` 据实回报 |
 | 断线 + 打开同步会话 | 回退读**本地镜像**（所以离线时能否看历史取决于镜像是否完整） |
 | 新会话出现 | autosync 每 10 秒拉清单导入；空白会话（还没说话）不导入，等它有内容后自然进来 |
 | 电脑侧归档 | 手机侧跟着归档；电脑清单**为空**时不做减法（避免瞬时失败把整批会话清空） |
@@ -159,7 +160,8 @@ Get-Content ~/.dsh/dsh-remote/phone-diag.jsonl -Tail 1 | ConvertFrom-Json | Sele
 | 「电脑不认识这台手机」 | 不在白名单 | 手机重新配对，电脑点「允许」 |
 | 推插件回 `503 no-confirm-channel` | 手机界面没有订阅者（App 不在前台） | 打开手机 DSH 停在任意会话再推；确认卡必须人工点「允许」 |
 | 推插件回 401 | 两端版本不一致（旧版不带 nonce） | 两端升到同一版本 |
-| 会话里「历史加载失败」 | 本地镜像是空壳/损坏，而联机远端流没走起来 | 确认已连电脑（`follow 拦截 … fromRemote=true` 应出现在手机日志）；升级到 ≥0.20.7 |
+| 会话里「历史加载失败」 | 本地镜像是空壳/损坏，而联机远端流没走起来 | 确认已连电脑（`follow 拦截 … fromRemote=true` 应出现在手机日志）；升级到 ≥0.22.0 |
+| 往上滑没反应 / 只有开头一小段 | 旧版把 `hasMore` 写死成 `false`，或两端版本不一致 | 两端升到 ≥0.22.0；日志里应有 `page 代理到电脑 … 取=N 更多=true/false` |
 | 会话显示成「（未命名对话）」 | 电脑侧那条会话本来没标题 | 0.20.1 起占位文案不再写进本地日志；正常会显示官方「未命名」 |
 | 通知不推送 | 该轮不是手机发起的 / 没指定回投会话 / `notify=false` | 看电脑日志 `notify 跳过（…）` 的具体原因 |
 | 一律 401 | 两端版本不一致 | 两端升到同一版本 |
@@ -167,9 +169,11 @@ Get-Content ~/.dsh/dsh-remote/phone-diag.jsonl -Tail 1 | ConvertFrom-Json | Sele
 ## 开发与测试
 
 ```bash
-npm test        # 语法检查 + 行为自检（10 组，全绿才算过）
+npm test        # pretest 先重建手机端 chunk，再跑 10 组语法/行为自检
 npm run build   # 由 lib/mobile/client.js 重建包内 chunk（lib/client.mobile.js）
 ```
+
+- 干净检出没有 `lib/client.mobile.js`（`.gitignore` 忽略），`pretest` 会先跑 `scripts/build-client-chunk.mjs`；CI 也只跑 `npm test`，不再因为缺构建产物红叉。
 
 - `lib/client.js` 必须是经典脚本 bundle（不能写 `import`）；手机 UI 是包内 chunk，由 `scripts/build-client-chunk.mjs` 生成。
 - `tests/session-sync.mjs` / `tests/plugin-install-confirm.mjs` 是**静态守卫**：钉住「基线只记成功 id」「诊断不依赖 run()」「空壳走远端流」「收包端 scope 名」这些一改就丢会话的行为。
@@ -179,6 +183,14 @@ npm run build   # 由 lib/mobile/client.js 重建包内 chunk（lib/client.mobil
 
 | 版本 | 变更 |
 |---|---|
+| 0.22.1 | 文档与 CI 收口：README 对齐 0.22.x（安装版本、历史协议、版本表）；`pretest` 先构建手机端 chunk，干净检出也能通过 `npm test`。 |
+| 0.22.0 | **首屏历史与上滑翻页按官方 `page` 协议重做**：首屏 500 条/页、最多取到 2000 条，`hasMore` 据实回报；`controller.page` 代理到电脑，`beforeSeq` / `throughSeq` 透传。以前写死 `hasMore=false`，等于把「加载更多」删了。 |
+| 0.21.7 | 历史翻页按三种 record 形状取上界（不再只取第一页）。 |
+| 0.21.6 | 真正删掉设置页「最近同步」。 |
+| 0.21.5 | 同步会话的历史读取代理到电脑（`controller.page`）。 |
+| 0.21.4 | 远端快照取满历史，并显式 `hasMore=false`。 |
+| 0.21.3 | 远端快照取足够历史 + 卡片按钮居中 + 去掉「最近同步」。 |
+| 0.21.2 | 设置页「最近同步」认后台 autosync 的结果（不再永远「成功 0 个」）。 |
 | 0.21.1 | 联机时 `growMirrors`（启动补深）也停掉，不再白写坏镜像。 |
 | 0.21.0 | 插件安装确认卡按官方提问卡规格重排（20px 圆角 / elevation-panel 阴影 / 11px 眉标 / 16px 标题 / 整行 40px 选项）。 |
 | 0.20.9 | 联机时停掉本地镜像历史搬运（`drainPreloadQueue`），不再「写坏 → 隔离 → 重建」循环。 |
